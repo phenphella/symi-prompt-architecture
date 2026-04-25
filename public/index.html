@@ -1,0 +1,1095 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prompt Architect — SY-MI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Georgia&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --green-dark:  #1a3d2e;
+  --green-mid:   #2d6a4f;
+  --green-light: #3a8a65;
+  --green-pale:  #e8f5ee;
+  --green-tint:  #f0faf4;
+  --gold:        #c9a84c;
+  --gold-dark:   #a07830;
+  --gold-light:  #d4a843;
+  --gold-pale:   #fdf8ec;
+  --cream:       #f7f8f6;
+  --white:       #ffffff;
+  --grey-50:     #f9fafb;
+  --grey-100:    #f3f4f6;
+  --grey-200:    #e5e7eb;
+  --grey-300:    #d1d5db;
+  --grey-400:    #9ca3af;
+  --grey-500:    #6b7280;
+  --grey-600:    #4b5563;
+  --grey-700:    #374151;
+  --grey-900:    #111827;
+  --red:         #dc2626;
+  --red-pale:    #fef2f2;
+  --code-bg:     #1e2433;
+  --code-border: #2e3448;
+}
+
+body {
+  font-family: 'Inter', 'Segoe UI', sans-serif;
+  background: var(--cream);
+  color: var(--grey-700);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+/* ── NAV ───────────────────────────────────────────────────────────────────── */
+nav {
+  background: var(--green-dark);
+  border-bottom: 3px solid var(--gold);
+  padding: 0 28px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  height: 60px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.nav-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+}
+.nav-brand-text { font-family: Georgia, serif; color: var(--gold); font-size: 18px; font-weight: bold; letter-spacing: 0.05em; }
+.nav-brand-sub  { color: rgba(201,168,76,0.55); font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase; margin-top: 1px; }
+.nav-links { display: flex; align-items: center; gap: 2px; margin-left: auto; }
+.nav-link {
+  color: rgba(255,255,255,0.55);
+  text-decoration: none;
+  font-size: 12px;
+  padding: 6px 12px;
+  border-radius: 5px;
+  transition: all 0.15s;
+  letter-spacing: 0.03em;
+}
+.nav-link:hover  { color: var(--gold); background: rgba(201,168,76,0.08); }
+.nav-link.active { color: var(--gold); background: rgba(201,168,76,0.12); font-weight: 600; }
+.nav-cta {
+  background: var(--green-mid);
+  color: var(--gold);
+  border: 1.5px solid var(--gold);
+  border-radius: 5px;
+  padding: 6px 14px;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  text-decoration: none;
+  margin-left: 8px;
+  letter-spacing: 0.04em;
+  transition: background 0.15s;
+}
+.nav-cta:hover { background: #245a40; }
+
+/* ── PAGE LAYOUT ────────────────────────────────────────────────────────────── */
+.page-header {
+  background: var(--green-dark);
+  padding: 28px 28px 24px;
+  border-bottom: 1px solid rgba(201,168,76,0.25);
+}
+.page-header h1 {
+  font-family: Georgia, serif;
+  color: var(--gold-light);
+  font-size: 24px;
+  margin-bottom: 6px;
+}
+.page-header p { color: rgba(255,255,255,0.7); font-size: 13px; max-width: 580px; line-height: 1.65; }
+
+.main { flex: 1; padding: 28px; max-width: 1200px; margin: 0 auto; width: 100%; }
+
+/* ── STEPPER ────────────────────────────────────────────────────────────────── */
+.stepper {
+  display: flex;
+  gap: 0;
+  margin-bottom: 28px;
+  border: 1px solid var(--grey-200);
+  border-radius: 10px;
+  overflow: hidden;
+  background: white;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+}
+.step {
+  flex: 1;
+  padding: 13px 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-right: 1px solid var(--grey-200);
+  cursor: pointer;
+  transition: background 0.15s;
+  position: relative;
+}
+.step:last-child { border-right: none; }
+.step:hover { background: var(--grey-50); }
+.step.active { background: var(--green-tint); }
+.step.done   { background: var(--green-tint); }
+.step-num {
+  width: 26px; height: 26px;
+  border-radius: 50%;
+  background: var(--grey-200);
+  color: var(--grey-500);
+  font-size: 11px;
+  font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.step.active .step-num { background: var(--green-mid); color: white; }
+.step.done   .step-num { background: var(--green-mid); color: white; }
+.step-label { font-size: 12px; font-weight: 600; color: var(--grey-500); }
+.step.active .step-label { color: var(--green-dark); }
+.step.done   .step-label { color: var(--green-mid); }
+
+/* ── CARDS ──────────────────────────────────────────────────────────────────── */
+.card {
+  background: white;
+  border: 1px solid var(--grey-200);
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+}
+.card + .card { margin-top: 16px; }
+.card-title {
+  font-family: Georgia, serif;
+  color: var(--green-dark);
+  font-size: 18px;
+  margin-bottom: 6px;
+}
+.card-desc { color: var(--grey-600); font-size: 13px; line-height: 1.7; margin-bottom: 20px; }
+
+/* ── FORMS ──────────────────────────────────────────────────────────────────── */
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 18px; }
+.form-group { display: flex; flex-direction: column; gap: 6px; }
+label.fld {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--grey-600);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+input.inp, textarea.inp {
+  border: 1.5px solid var(--grey-300);
+  border-radius: 7px;
+  padding: 10px 13px;
+  font-size: 13px;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  background: white;
+  color: var(--grey-700);
+}
+input.inp:focus, textarea.inp:focus {
+  border-color: var(--green-mid);
+  box-shadow: 0 0 0 3px rgba(45,106,79,0.1);
+}
+input.inp::placeholder, textarea.inp::placeholder { color: var(--grey-400); }
+textarea.inp { resize: none; }
+textarea.mono { font-family: 'Courier New', monospace; font-size: 11.5px; line-height: 1.7; }
+
+/* ── BUTTONS ────────────────────────────────────────────────────────────────── */
+.btn-primary {
+  background: var(--green-mid);
+  color: white;
+  border: none;
+  border-radius: 7px;
+  padding: 10px 22px;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 0.15s, box-shadow 0.15s;
+  box-shadow: 0 2px 6px rgba(45,106,79,0.2);
+}
+.btn-primary:hover { background: var(--green-dark); box-shadow: 0 3px 10px rgba(45,106,79,0.3); }
+.btn-primary:disabled { opacity: 0.4; cursor: not-allowed; box-shadow: none; }
+.btn-gold {
+  background: white;
+  color: var(--green-dark);
+  border: 1.5px solid var(--green-mid);
+  border-radius: 7px;
+  padding: 8px 16px;
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.btn-gold:hover { background: var(--green-tint); border-color: var(--green-dark); }
+.btn-ghost {
+  background: white;
+  border: 1px solid var(--grey-300);
+  border-radius: 7px;
+  padding: 8px 16px;
+  font-family: inherit;
+  font-size: 11px;
+  color: var(--grey-600);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.btn-ghost:hover { border-color: var(--green-mid); color: var(--green-mid); background: var(--green-tint); }
+.btn-sm-danger {
+  background: none;
+  border: 1px solid rgba(220,38,38,0.25);
+  border-radius: 5px;
+  padding: 5px 10px;
+  font-size: 10px;
+  color: var(--red);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.btn-sm-danger:hover { background: var(--red-pale); }
+
+.btn-row { display: flex; justify-content: space-between; align-items: center; margin-top: 22px; }
+
+/* ── SECTION LABEL ──────────────────────────────────────────────────────────── */
+.sec-label {
+  font-family: Georgia, serif;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--green-dark);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+
+/* ── FIELD TAGS ─────────────────────────────────────────────────────────────── */
+.field-list { display: flex; flex-direction: column; gap: 4px; max-height: 220px; overflow-y: auto; padding-right: 4px; }
+.field-tag {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  border: 1px solid;
+}
+.field-tag.dropdown { background: var(--green-tint); border-color: rgba(45,106,79,0.2); }
+.field-tag.date     { background: var(--gold-pale);  border-color: rgba(201,168,76,0.3); }
+.field-tag.text     { background: var(--grey-50);    border-color: var(--grey-200); }
+.field-tag .f-name  { flex: 1; font-weight: 500; color: var(--grey-700); }
+.field-tag .f-type  { font-size: 9px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; }
+.field-tag.dropdown .f-type { color: var(--green-mid); }
+.field-tag.date     .f-type { color: var(--gold-dark); }
+.field-tag.text     .f-type { color: var(--grey-500); }
+.field-tag .f-count { font-size: 9px; color: var(--grey-400); }
+
+/* ── DEFAULTS ───────────────────────────────────────────────────────────────── */
+.default-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--green-tint);
+  border: 1px solid rgba(45,106,79,0.2);
+  border-radius: 7px;
+  padding: 8px 12px;
+  margin-bottom: 6px;
+}
+.default-row .d-field { font-weight: 600; color: var(--green-dark); font-size: 12px; }
+.default-row .d-arrow { color: var(--grey-400); font-size: 11px; }
+.default-row .d-val   { color: var(--green-mid); font-weight: 600; font-size: 12px; flex: 1; }
+.def-add { display: flex; gap: 8px; margin-bottom: 12px; }
+
+/* ── PROMPT TABS ────────────────────────────────────────────────────────────── */
+.tab-bar {
+  display: flex;
+  gap: 2px;
+  background: var(--grey-100);
+  padding: 3px;
+  border-radius: 9px;
+  width: fit-content;
+  border: 1px solid var(--grey-200);
+}
+.tab-btn {
+  padding: 7px 20px;
+  border: none;
+  border-radius: 7px;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  cursor: pointer;
+  transition: all 0.15s;
+  background: transparent;
+  color: var(--grey-500);
+}
+.tab-btn.active { background: white; color: var(--green-dark); box-shadow: 0 1px 4px rgba(0,0,0,0.1); }
+
+/* ── CODE BLOCK ─────────────────────────────────────────────────────────────── */
+.code-wrap {
+  background: var(--code-bg);
+  border: 1px solid var(--code-border);
+  border-radius: 10px;
+  overflow: hidden;
+}
+.code-topbar {
+  background: #252b3b;
+  padding: 9px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--code-border);
+}
+.code-dots { display: flex; gap: 5px; }
+.code-dot  { width: 10px; height: 10px; border-radius: 50%; }
+.code-filename { font-family: monospace; font-size: 10px; color: #8892a4; }
+.code-copy { background: #2e3448; border: none; color: #8892a4; font-size: 10px; padding: 3px 9px; border-radius: 4px; cursor: pointer; font-family: inherit; transition: all 0.15s; }
+.code-copy:hover { color: #e2e8f0; background: #3a4160; }
+.code-body { padding: 16px; max-height: 440px; overflow-y: auto; }
+.code-body pre { color: #a8f0c6; font-size: 11.5px; font-family: 'Courier New', monospace; white-space: pre-wrap; line-height: 1.75; }
+
+/* ── CHAT ───────────────────────────────────────────────────────────────────── */
+.chat-box {
+  background: var(--grey-50);
+  border: 1px solid var(--grey-200);
+  border-radius: 10px;
+  padding: 16px;
+  height: 340px;
+  overflow-y: auto;
+}
+.chat-msg { display: flex; gap: 8px; margin-bottom: 12px; }
+.chat-msg.user { flex-direction: row-reverse; }
+.chat-avatar {
+  width: 30px; height: 30px;
+  border-radius: 50%;
+  border: 2px solid var(--gold);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  font-size: 11px;
+  font-weight: 700;
+}
+.chat-msg.user .chat-avatar   { background: var(--green-mid); color: white; }
+.chat-msg.agent .chat-avatar  { background: var(--green-dark); }
+.chat-bubble {
+  max-width: 82%;
+  padding: 10px 14px;
+  font-size: 13px;
+  line-height: 1.6;
+  border-radius: 14px;
+}
+.chat-msg.user  .chat-bubble { background: var(--green-mid); color: white; border-radius: 14px 14px 4px 14px; }
+.chat-msg.agent .chat-bubble { background: white; border: 1px solid var(--grey-200); color: var(--grey-700); border-radius: 14px 14px 14px 4px; white-space: pre-wrap; }
+.chat-input-row { display: flex; gap: 8px; margin-top: 8px; }
+.chat-input-row input { flex: 1; }
+
+/* ── TYPING DOTS ────────────────────────────────────────────────────────────── */
+.typing { display: flex; gap: 4px; padding: 4px 0; }
+.typing span {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: var(--green-light);
+  animation: bounce 1s infinite;
+}
+.typing span:nth-child(2) { animation-delay: 0.2s; }
+.typing span:nth-child(3) { animation-delay: 0.4s; }
+@keyframes bounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-4px)} }
+
+/* ── SUGGESTIONS ────────────────────────────────────────────────────────────── */
+.suggestions { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 8px; }
+.suggestion-chip {
+  background: white;
+  border: 1px solid var(--grey-300);
+  border-radius: 20px;
+  padding: 5px 11px;
+  font-size: 11px;
+  color: var(--grey-600);
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.15s;
+}
+.suggestion-chip:hover { border-color: var(--green-mid); color: var(--green-mid); background: var(--green-tint); }
+
+/* ── LIBRARY ────────────────────────────────────────────────────────────────── */
+.lib-entry {
+  background: white;
+  border: 1px solid var(--grey-200);
+  border-radius: 10px;
+  padding: 18px 20px;
+  margin-bottom: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: box-shadow 0.15s, border-color 0.15s;
+}
+.lib-entry:hover { box-shadow: 0 3px 10px rgba(0,0,0,0.08); border-color: var(--grey-300); }
+.lib-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 9px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+  margin-left: 8px;
+}
+.badge-green { background: var(--green-tint); color: var(--green-mid); border: 1px solid rgba(45,106,79,0.2); }
+.badge-grey  { color: var(--grey-500); font-size: 11px; background: var(--grey-100); border: 1px solid var(--grey-200); border-radius: 20px; padding: 2px 8px; }
+
+/* ── GENERATING ─────────────────────────────────────────────────────────────── */
+.generating {
+  display: flex; flex-direction: column; align-items: center;
+  justify-content: center; padding: 80px 0; gap: 18px; text-align: center;
+}
+.spinner {
+  width: 44px; height: 44px;
+  border: 4px solid rgba(45,106,79,0.15);
+  border-top-color: var(--green-mid);
+  border-radius: 50%;
+  animation: spin 0.9s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── ERROR ──────────────────────────────────────────────────────────────────── */
+.error-msg {
+  color: var(--red);
+  font-size: 12px;
+  margin-top: 8px;
+  background: var(--red-pale);
+  border: 1px solid rgba(220,38,38,0.2);
+  border-radius: 6px;
+  padding: 8px 12px;
+}
+
+/* ── GRID ───────────────────────────────────────────────────────────────────── */
+.two-col { display: grid; grid-template-columns: 1fr 1.4fr; gap: 20px; }
+.refine-grid { display: grid; grid-template-columns: 1.1fr 1fr; gap: 20px; }
+
+/* ── META TAGS ──────────────────────────────────────────────────────────────── */
+.meta-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px; }
+.meta-tag {
+  background: var(--green-tint);
+  border: 1px solid rgba(45,106,79,0.2);
+  border-radius: 20px;
+  padding: 3px 10px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--green-mid);
+}
+
+/* ── FOOTER ─────────────────────────────────────────────────────────────────── */
+footer {
+  background: var(--green-dark);
+  border-top: 2px solid var(--gold);
+  padding: 12px 28px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: auto;
+}
+.footer-brand { font-family: Georgia, serif; font-size: 11px; color: rgba(201,168,76,0.6); letter-spacing: 0.08em; }
+.footer-ver   { font-size: 10px; color: rgba(201,168,76,0.4); }
+
+/* ── RESPONSIVE ─────────────────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .form-row, .two-col, .refine-grid { grid-template-columns: 1fr; }
+  .stepper { display: none; }
+  nav { padding: 0 16px; }
+  .main { padding: 16px; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a class="nav-brand" href="/">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 420" width="32" height="34">
+      <defs>
+        <linearGradient id="gG" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" style="stop-color:#d4a843"/><stop offset="100%" style="stop-color:#a07830"/>
+        </linearGradient>
+        <linearGradient id="bG" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" style="stop-color:#2d6a4f"/><stop offset="100%" style="stop-color:#1a3d2e"/>
+        </linearGradient>
+      </defs>
+      <path d="M200 20 L355 78 L355 220 C355 310 278 370 200 396 C122 370 45 310 45 220 L45 78 Z" fill="url(#bG)" stroke="#c9a84c" stroke-width="4"/>
+      <path d="M200 44 L333 94 L333 222 C333 300 264 354 200 376 C136 354 67 300 67 222 L67 94 Z" fill="none" stroke="#c9a84c" stroke-width="1" stroke-opacity="0.3"/>
+      <rect x="88" y="118" width="224" height="2" fill="url(#gG)" rx="1"/>
+      <text x="200" y="204" font-family="Georgia,serif" font-size="74" font-weight="bold" fill="url(#gG)" text-anchor="middle">SY-MI</text>
+      <rect x="88" y="245" width="224" height="2" fill="url(#gG)" rx="1"/>
+    </svg>
+    <div>
+      <div class="nav-brand-text">SY-MI</div>
+      <div class="nav-brand-sub">Mind Over Matter</div>
+    </div>
+  </a>
+  <div class="nav-links">
+    <a href="/" class="nav-link">Home</a>
+    <a href="/how-it-works" class="nav-link">How It Works</a>
+    <a href="/prompt-architect" class="nav-link active">Prompt Architect</a>
+    <a href="/library" class="nav-link">Library</a>
+    <a href="/download" class="nav-cta">⬇ Download Extension</a>
+  </div>
+</nav>
+
+<!-- PAGE HEADER -->
+<div class="page-header">
+  <h1>Prompt Architect</h1>
+  <p>Turn any Visual Files MI screen into a complete LLM extraction prompt in minutes. Paste source code, set your defaults, generate, and refine by chat.</p>
+</div>
+
+<!-- STEPPER -->
+<div class="main">
+  <div class="stepper" id="stepper">
+    <div class="step active" id="step-1" onclick="goToStep(1)">
+      <div class="step-num" id="sn-1">1</div>
+      <div class="step-label">Source Code</div>
+    </div>
+    <div class="step" id="step-2" onclick="goToStep(2)">
+      <div class="step-num" id="sn-2">2</div>
+      <div class="step-label">Set Defaults</div>
+    </div>
+    <div class="step" id="step-3" onclick="goToStep(3)">
+      <div class="step-num" id="sn-3">3</div>
+      <div class="step-label">Generate</div>
+    </div>
+    <div class="step" id="step-4" onclick="goToStep(4)">
+      <div class="step-num" id="sn-4">4</div>
+      <div class="step-label">Refine & Save</div>
+    </div>
+  </div>
+
+  <!-- ── STAGE 1: PASTE ─────────────────────────────────────────────────────── -->
+  <div id="stage-1">
+    <div class="card">
+      <div class="card-title">Step 1 — Team details &amp; source code</div>
+      <p class="card-desc">Enter the team name and claim type, then get the source code from the MI screen.<br>
+        <strong>How to get the source code:</strong> Open the MI screen in Visual Files → right-click anywhere on the page → select <strong>"View Page Source"</strong> (or press <strong>Ctrl+U</strong>). This opens the source in a new tab. Press <strong>Ctrl+A</strong> to select all, <strong>Ctrl+C</strong> to copy, then paste it below.
+      </p>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="fld" for="inp-team">Team name</label>
+          <input class="inp" id="inp-team" type="text" placeholder="e.g. Allianz Disease">
+        </div>
+        <div class="form-group">
+          <label class="fld" for="inp-claim">Claim type</label>
+          <input class="inp" id="inp-claim" type="text" placeholder="e.g. OH Disease / RTA / EL Accident">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="fld" for="inp-html">Paste HTML source code</label>
+        <textarea class="inp mono" id="inp-html" rows="10" placeholder="Paste the full Visual Files page source code here…&#10;&#10;How to get it:&#10;1. Open the MI screen in Visual Files&#10;2. Right-click on the page → View Page Source (Ctrl+U)&#10;3. A new tab opens with the source code&#10;4. Press Ctrl+A to select all, then Ctrl+C to copy&#10;5. Click here and press Ctrl+V to paste"></textarea>
+      </div>
+      <div id="err-1" class="error-msg" style="display:none"></div>
+      <div class="btn-row">
+        <span style="font-size:11px;color:var(--grey-500)"></span>
+        <button class="btn-primary" onclick="parseFields()">Parse Fields →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── STAGE 2: DEFAULTS ──────────────────────────────────────────────────── -->
+  <div id="stage-2" style="display:none">
+    <div class="two-col">
+      <div class="card">
+        <div class="sec-label">Fields found — <span id="field-count">0</span> total</div>
+        <div style="margin-bottom:14px">
+          <div style="font-size:10px;font-weight:700;color:var(--green-mid);letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px">Initial MI (<span id="init-count">0</span>)</div>
+          <div class="field-list" id="init-fields"></div>
+        </div>
+        <div>
+          <div style="font-size:10px;font-weight:700;color:var(--gold-dark);letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px">Closing MI (<span id="close-count">0</span>)</div>
+          <div class="field-list" id="close-fields"></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">Step 2 — Set default values</div>
+        <p class="card-desc">Some fields always have the same answer for this team or claim type. Add them here and they'll be hardcoded as rules in the generated prompt. You can still refine them by chat afterwards.</p>
+        <div class="def-add">
+          <input class="inp" id="def-field" type="text" placeholder="Field name" style="flex:2;font-size:12px">
+          <input class="inp" id="def-val" type="text" placeholder="Always value" style="flex:1;font-size:12px">
+          <button class="btn-primary" onclick="addDefault()" style="padding:9px 14px;font-size:11px">Add</button>
+        </div>
+        <div id="defaults-list"></div>
+        <div id="defaults-hint" style="background:#f0fdf4;border:1px dashed rgba(45,106,79,0.25);border-radius:7px;padding:14px;font-size:13px;color:#4b5563;line-height:1.8;margin-bottom:14px">
+          No defaults yet. Common examples for OH Disease:<br>
+          <em>Client Office/Branch → Casualty Disease</em><br>
+          <em>Personal injury claim? → Yes</em><br>
+          <em>Type of injury → Deafness/Injury to ears</em>
+        </div>
+        <div id="err-2" class="error-msg" style="display:none"></div>
+        <div class="btn-row">
+          <button class="btn-ghost" onclick="show(1)">← Back</button>
+          <button class="btn-primary" onclick="generatePrompts()">Generate Prompts →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── STAGE 3: GENERATING ────────────────────────────────────────────────── -->
+  <div id="stage-3" style="display:none">
+    <div class="card generating">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 420" width="56" height="59">
+        <defs>
+          <linearGradient id="gG2" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#d4a843"/><stop offset="100%" style="stop-color:#a07830"/></linearGradient>
+          <linearGradient id="bG2" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#2d6a4f"/><stop offset="100%" style="stop-color:#1a3d2e"/></linearGradient>
+        </defs>
+        <path d="M200 20 L355 78 L355 220 C355 310 278 370 200 396 C122 370 45 310 45 220 L45 78 Z" fill="url(#bG2)" stroke="#c9a84c" stroke-width="4"/>
+        <text x="200" y="204" font-family="Georgia,serif" font-size="74" font-weight="bold" fill="url(#gG2)" text-anchor="middle">SY-MI</text>
+      </svg>
+      <div class="spinner"></div>
+      <p style="font-family:Georgia,serif;color:var(--green-dark);font-size:17px;font-weight:bold">Generating prompts…</p>
+      <p style="color:var(--grey-600);font-size:13px" id="gen-status">Writing field rules across both prompt types</p>
+    </div>
+  </div>
+
+  <!-- ── STAGE 4: REFINE ────────────────────────────────────────────────────── -->
+  <div id="stage-4" style="display:none">
+    <div class="refine-grid">
+      <!-- Prompt display -->
+      <div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+          <div class="tab-bar">
+            <button class="tab-btn active" id="tab-initial" onclick="switchTab('initial')">Initial MI</button>
+            <button class="tab-btn" id="tab-closing" onclick="switchTab('closing')">Closing MI</button>
+          </div>
+          <div style="display:flex;gap:6px">
+            <button class="btn-gold" onclick="saveToLibrary()" style="font-size:10px;padding:7px 12px">💾 Save to Library</button>
+            <button class="btn-ghost" id="copy-btn" onclick="copyPrompt()" style="font-size:10px">Copy</button>
+          </div>
+        </div>
+
+        <div class="code-wrap">
+          <div class="code-topbar">
+            <div class="code-dots">
+              <div class="code-dot" style="background:#e05252"></div>
+              <div class="code-dot" style="background:#c9a84c"></div>
+              <div class="code-dot" style="background:#2d6a4f"></div>
+            </div>
+            <span class="code-filename" id="code-filename">prompt.txt</span>
+            <button class="code-copy" id="code-copy-btn" onclick="copyPrompt()">Copy</button>
+          </div>
+          <div class="code-body">
+            <pre id="prompt-display"></pre>
+          </div>
+        </div>
+
+        <div class="meta-tags" id="meta-tags"></div>
+      </div>
+
+      <!-- Chat -->
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <div class="sec-label">Refine by chat</div>
+          <span style="font-size:11px;color:var(--grey-500)">Changes apply to active tab</span>
+        </div>
+
+        <div class="chat-box" id="chat-box"></div>
+
+        <div class="chat-input-row">
+          <input class="inp" id="chat-input" type="text" placeholder="Tell me what to change…" onkeydown="if(event.key==='Enter')sendChat()" style="font-size:12px">
+          <button class="btn-primary" onclick="sendChat()" id="chat-send-btn" style="padding:9px 16px">Send</button>
+        </div>
+
+        <div>
+          <div style="font-size:11px;color:var(--grey-600);margin-bottom:6px">Quick suggestions:</div>
+          <div class="suggestions">
+            <button class="suggestion-chip" onclick="setInput('Change CPR Track default to Fast Track')">Change CPR Track default</button>
+            <button class="suggestion-chip" onclick="setInput('Make Disease Type always NIHL')">Disease Type always NIHL</button>
+            <button class="suggestion-chip" onclick="setInput('Add a Union field rule')">Add Union rule</button>
+            <button class="suggestion-chip" onclick="setInput('Adjust the QUOCs rule')">Adjust QUOCs rule</button>
+            <button class="suggestion-chip" onclick="setInput('Split Bill should always be No')">Split Bill always No</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── LIBRARY VIEW ───────────────────────────────────────────────────────── -->
+  <div id="stage-lib" style="display:none">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px">
+      <div>
+        <h2 style="font-family:Georgia,serif;color:var(--green-dark);font-size:22px;margin-bottom:4px">Prompt Library</h2>
+        <p style="color:var(--grey-600);font-size:13px">All saved extraction prompts for your teams</p>
+      </div>
+      <button class="btn-ghost" onclick="showStage(lastStage)">← Back to Architect</button>
+    </div>
+    <div id="library-list">
+      <div style="text-align:center;padding:60px;color:var(--grey-400);font-size:14px">No prompts saved yet.</div>
+    </div>
+  </div>
+
+</div><!-- /main -->
+
+<!-- FOOTER -->
+<footer>
+  <span class="footer-brand">SY-MI — MATTER INTELLIGENCE</span>
+  <span class="footer-ver">Prompt Architect · sy-mi.com</span>
+</footer>
+
+<!-- ── JAVASCRIPT ─────────────────────────────────────────────────────────────── -->
+<script>
+// ── State ──────────────────────────────────────────────────────────────────────
+var state = {
+  stage: 1,
+  team: '', claimType: '',
+  initFields: [], closeFields: [],
+  defaults: [],
+  prompts: { initial: '', closing: '' },
+  activeTab: 'initial',
+  chat: [],
+  library: JSON.parse(localStorage.getItem('symi_lib') || '[]'),
+  loading: false,
+};
+var lastStage = 1;
+
+var SYSTEM_PROMPT = `You are the Sy-MI Prompt Architect, an expert legal AI assistant specialising in writing data extraction prompts for Visual Files MI forms used by UK insurance defence law firms.
+
+Generate precise, structured extraction prompts that:
+- Follow the exact two-part structure (Part 1 of 2 / Part 2 of 2)
+- Use VERTICAL CSV output format (FieldName,Value)
+- Include intelligent field rules based on field name, type and UK insurance litigation context
+- Omit unknown fields rather than outputting blanks (preserves existing Visual Files data)
+- List all valid options explicitly for dropdown fields
+- Apply dd/MM/yyyy format to all date fields
+- Apply "numerals only, no £ sign" to all monetary fields
+- Hardcode any default values specified
+
+For initial MI: documents = full case papers from client + fee earner written advice.
+For closing MI: documents = settlement correspondence + costs team initial advice + request for settlement funds.
+
+When refining, return the complete updated prompt only — no commentary.
+When generating, output ONLY the prompt text — no commentary before or after.`;
+
+// ── Field Parser ───────────────────────────────────────────────────────────────
+function parseFieldsFromHTML(html) {
+  var parser = new DOMParser();
+  var doc = parser.parseFromString(html, 'text/html');
+  var fields = [];
+  var rows = doc.querySelectorAll('tr');
+  rows.forEach(function(row) {
+    var labelEl = row.querySelector("[id^='gvMatterData_lblLabel_']");
+    if (!labelEl) return;
+    var label = labelEl.textContent.trim();
+    if (!label) return;
+    var select = row.querySelector('select');
+    var input = row.querySelector("input[type='text']");
+    if (select) {
+      var opts = Array.from(select.querySelectorAll('option')).map(function(o) { return o.value; }).filter(function(v) { return v !== ''; });
+      fields.push({ name: label, type: 'dropdown', options: opts });
+    } else if (input) {
+      var errEl = row.querySelector('.error');
+      var isDate = errEl && errEl.textContent.includes('dd/MM/yyyy');
+      fields.push({ name: label, type: isDate ? 'date' : 'text' });
+    }
+  });
+  return fields;
+}
+
+var closingKW = ['settlement','settled','trial','disposal','recovered','awarded','quoc','litigation damages','litigation costs','amount recovered','reason for success','successful?','method of settlement','p36','provisional damages','date p36','did case proceed','recovered from','applicable quoc','date closed','date recovered'];
+
+function groupFields(fields) {
+  var init = [], close = [];
+  fields.forEach(function(f) {
+    var lower = f.name.toLowerCase();
+    if (closingKW.some(function(k) { return lower.includes(k); })) close.push(f);
+    else init.push(f);
+  });
+  return { initial: init, closing: close };
+}
+
+// ── Stage navigation ───────────────────────────────────────────────────────────
+function show(n) {
+  lastStage = state.stage;
+  state.stage = n;
+  [1,2,3,4,'lib'].forEach(function(s) {
+    var el = document.getElementById('stage-' + s);
+    if (el) el.style.display = (s === n || s === String(n)) ? '' : 'none';
+  });
+  updateStepper();
+}
+function showStage(n) { show(n); }
+
+function updateStepper() {
+  [1,2,3,4].forEach(function(i) {
+    var step = document.getElementById('step-' + i);
+    var sn   = document.getElementById('sn-' + i);
+    if (!step) return;
+    step.className = 'step';
+    if (i < state.stage)      { step.classList.add('done');   sn.textContent = '✓'; }
+    else if (i === state.stage){ step.classList.add('active'); sn.textContent = i; }
+    else                       { sn.textContent = i; }
+  });
+}
+
+function goToStep(n) {
+  if (n < state.stage) show(n);
+}
+
+// ── Parse ──────────────────────────────────────────────────────────────────────
+function parseFields() {
+  var team = document.getElementById('inp-team').value.trim();
+  var claim = document.getElementById('inp-claim').value.trim();
+  var html = document.getElementById('inp-html').value.trim();
+  var err = document.getElementById('err-1');
+  err.style.display = 'none';
+  if (!team || !claim) { err.textContent = 'Please enter team name and claim type.'; err.style.display = 'block'; return; }
+  if (!html) { err.textContent = 'Please paste the source code.'; err.style.display = 'block'; return; }
+  var fields = parseFieldsFromHTML(html);
+  if (!fields.length) { err.textContent = 'No fields found. Ensure you pasted the complete Visual Files page source code.'; err.style.display = 'block'; return; }
+  state.team = team; state.claimType = claim;
+  var grouped = groupFields(fields);
+  state.initFields = grouped.initial; state.closeFields = grouped.closing;
+  renderFieldList('init-fields', grouped.initial);
+  renderFieldList('close-fields', grouped.closing);
+  document.getElementById('field-count').textContent = fields.length;
+  document.getElementById('init-count').textContent = grouped.initial.length;
+  document.getElementById('close-count').textContent = grouped.closing.length;
+  show(2);
+}
+
+function renderFieldList(id, fields) {
+  var el = document.getElementById(id);
+  el.innerHTML = fields.map(function(f) {
+    var opts = f.type === 'dropdown' ? ' <span class="f-count">'+f.options.length+'</span>' : '';
+    return '<div class="field-tag '+f.type+'"><span class="f-name">'+f.name+'</span><span class="f-type">'+f.type+'</span>'+opts+'</div>';
+  }).join('');
+}
+
+// ── Defaults ───────────────────────────────────────────────────────────────────
+function addDefault() {
+  var f = document.getElementById('def-field').value.trim();
+  var v = document.getElementById('def-val').value.trim();
+  if (!f || !v) return;
+  state.defaults.push({ f: f, v: v });
+  document.getElementById('def-field').value = '';
+  document.getElementById('def-val').value = '';
+  renderDefaults();
+}
+function removeDefault(i) { state.defaults.splice(i, 1); renderDefaults(); }
+function renderDefaults() {
+  var hint = document.getElementById('defaults-hint');
+  var list = document.getElementById('defaults-list');
+  hint.style.display = state.defaults.length ? 'none' : '';
+  list.innerHTML = state.defaults.map(function(d, i) {
+    return '<div class="default-row"><span class="d-field">'+d.f+'</span><span class="d-arrow">→</span><span class="d-val">'+d.v+'</span><button class="btn-sm-danger" onclick="removeDefault('+i+')">✕</button></div>';
+  }).join('');
+}
+
+// ── Generate ───────────────────────────────────────────────────────────────────
+function generatePrompts() {
+  show(3);
+  var defs = state.defaults.length ? '\n\nHARDCODED DEFAULTS:\n' + state.defaults.map(function(d) { return '- '+d.f+': always "'+d.v+'"'; }).join('\n') : '';
+  var fmt = function(arr) {
+    return arr.map(function(f) {
+      var s = '- '+f.name+' ['+f.type+']';
+      if (f.type === 'dropdown') s += ' OPTIONS: '+f.options.join(' | ');
+      return s;
+    }).join('\n');
+  };
+  document.getElementById('gen-status').textContent = 'Writing field rules for ' + (state.initFields.length + state.closeFields.length) + ' fields across ' + state.team + ' — ' + state.claimType;
+
+  var initMsg = 'Generate the INITIAL MI extraction prompt.\n\nTeam: '+state.team+'\nClaim Type: '+state.claimType+defs+'\n\nINITIAL MI FIELDS ('+state.initFields.length+'):\n'+fmt(state.initFields)+'\n\nContext: The AI model will receive the full case papers from the client plus the fee earner\'s written advice. Insurance defence firm handling '+state.claimType+' for '+state.team+'.\n\nWrite the complete two-part prompt (Part 1 of 2 and Part 2 of 2). End Part 2 with a realistic example output.';
+  var closeMsg = 'Generate the CLOSING/SETTLEMENT MI extraction prompt.\n\nTeam: '+state.team+'\nClaim Type: '+state.claimType+defs+'\n\nCLOSING MI FIELDS ('+state.closeFields.length+'):\n'+fmt(state.closeFields)+'\n\nContext: The AI model will receive settlement correspondence, the costs team\'s initial advice and any request for settlement funds. Omit unknown fields to preserve existing Visual Files data. Include two example outputs: one Part 36 settlement with costs outstanding, one discontinuance.';
+
+  Promise.all([
+    callAPI([{ role: 'user', content: initMsg }]),
+    callAPI([{ role: 'user', content: closeMsg }])
+  ]).then(function(results) {
+    state.prompts.initial = results[0];
+    state.prompts.closing = results[1];
+    state.activeTab = 'initial';
+    state.chat = [{ role: 'assistant', content: '✓ Both prompts generated for '+state.team+' — '+state.claimType+'.\n\nUse the tabs to switch between Initial MI and Closing MI.\n\nTell me anything you\'d like to change — for example:\n• "The CPR Track default should be Fast Track"\n• "Add a rule that Disease Type is always Asthma"\n• "The Union field should always be blank"\n\nWhen happy with both, click Save to Library.' }];
+    renderChat();
+    renderPrompt();
+    renderMetaTags();
+    show(4);
+  }).catch(function() {
+    document.getElementById('err-2').textContent = 'Generation failed. Please check your API key and try again.';
+    document.getElementById('err-2').style.display = 'block';
+    show(2);
+  });
+}
+
+// ── API ────────────────────────────────────────────────────────────────────────
+function callAPI(messages) {
+  return fetch('/api/claude', {
+    method:  'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      system:   SYSTEM_PROMPT,
+      messages: messages
+    })
+  })
+  .then(function(r) {
+    if (!r.ok) return r.json().then(function(e) { throw new Error(JSON.stringify(e)); });
+    return r.json();
+  })
+  .then(function(d) { return d.text || ''; });
+}
+
+// ── Chat ───────────────────────────────────────────────────────────────────────
+function sendChat() {
+  var inp = document.getElementById('chat-input');
+  var msg = inp.value.trim();
+  if (!msg || state.loading) return;
+  inp.value = '';
+  state.chat.push({ role: 'user', content: msg });
+  renderChat();
+  state.loading = true;
+  document.getElementById('chat-send-btn').disabled = true;
+  addTyping();
+  var cur = state.activeTab === 'initial' ? state.prompts.initial : state.prompts.closing;
+  var label = state.activeTab === 'initial' ? 'Initial MI' : 'Closing MI';
+  callAPI([{ role: 'user', content: 'Refining the '+label+' prompt for '+state.team+' — '+state.claimType+'.\n\nCURRENT PROMPT:\n'+cur+'\n\nUSER REQUEST: '+msg+'\n\nReturn the complete updated prompt only.' }]).then(function(reply) {
+    removeTyping();
+    var isPrompt = reply.includes('Part 1 of') || reply.includes('FIELD RULES') || reply.includes('FieldName,Value');
+    if (isPrompt) {
+      state.prompts[state.activeTab] = reply;
+      renderPrompt();
+      state.chat.push({ role: 'assistant', content: '✓ '+label+' prompt updated.\n\nAnything else to change?' });
+    } else {
+      state.chat.push({ role: 'assistant', content: reply });
+    }
+    renderChat();
+    state.loading = false;
+    document.getElementById('chat-send-btn').disabled = false;
+  }).catch(function() {
+    removeTyping();
+    state.chat.push({ role: 'assistant', content: 'Something went wrong. Please try again.' });
+    renderChat();
+    state.loading = false;
+    document.getElementById('chat-send-btn').disabled = false;
+  });
+}
+
+function setInput(txt) { document.getElementById('chat-input').value = txt; document.getElementById('chat-input').focus(); }
+
+function renderChat() {
+  var box = document.getElementById('chat-box');
+  box.innerHTML = state.chat.map(function(m) {
+    var cls = m.role === 'user' ? 'user' : 'agent';
+    var avatar = m.role === 'user' ? '<div class="chat-avatar">U</div>' : '<div class="chat-avatar"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 420" width="16" height="17"><defs><linearGradient id="cg" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#d4a843"/><stop offset="100%" style="stop-color:#a07830"/></linearGradient><linearGradient id="cb" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#2d6a4f"/><stop offset="100%" style="stop-color:#1a3d2e"/></linearGradient></defs><path d="M200 20 L355 78 L355 220 C355 310 278 370 200 396 C122 370 45 310 45 220 L45 78 Z" fill="url(#cb)" stroke="#c9a84c" stroke-width="8"/><text x="200" y="240" font-family="Georgia,serif" font-size="120" font-weight="bold" fill="url(#cg)" text-anchor="middle">M</text></svg></div>';
+    var bubble = '<div class="chat-bubble">'+escHtml(m.content)+'</div>';
+    return '<div class="chat-msg '+cls+'">'+avatar+bubble+'</div>';
+  }).join('');
+  box.scrollTop = box.scrollHeight;
+}
+
+function addTyping() {
+  var box = document.getElementById('chat-box');
+  var d = document.createElement('div');
+  d.className = 'chat-msg agent'; d.id = 'typing-indicator';
+  d.innerHTML = '<div class="chat-avatar"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 420" width="16" height="17"><defs><linearGradient id="tg" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#d4a843"/><stop offset="100%" style="stop-color:#a07830"/></linearGradient><linearGradient id="tb" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#2d6a4f"/><stop offset="100%" style="stop-color:#1a3d2e"/></linearGradient></defs><path d="M200 20 L355 78 L355 220 C355 310 278 370 200 396 C122 370 45 310 45 220 L45 78 Z" fill="url(#tb)" stroke="#c9a84c" stroke-width="8"/><text x="200" y="240" font-family="Georgia,serif" font-size="120" font-weight="bold" fill="url(#tg)" text-anchor="middle">M</text></svg></div><div class="chat-bubble"><div class="typing"><span></span><span></span><span></span></div></div>';
+  box.appendChild(d); box.scrollTop = box.scrollHeight;
+}
+function removeTyping() { var el = document.getElementById('typing-indicator'); if (el) el.remove(); }
+
+// ── Prompt display ─────────────────────────────────────────────────────────────
+function switchTab(t) {
+  state.activeTab = t;
+  document.getElementById('tab-initial').className = 'tab-btn' + (t === 'initial' ? ' active' : '');
+  document.getElementById('tab-closing').className = 'tab-btn' + (t === 'closing' ? ' active' : '');
+  renderPrompt();
+}
+function renderPrompt() {
+  var p = state.activeTab === 'initial' ? state.prompts.initial : state.prompts.closing;
+  document.getElementById('prompt-display').textContent = p;
+  var fn = state.team.toLowerCase().replace(/\s/g,'-') + '-' + state.activeTab + '-mi-prompt.txt';
+  document.getElementById('code-filename').textContent = fn;
+}
+function renderMetaTags() {
+  document.getElementById('meta-tags').innerHTML =
+    '<span class="meta-tag">Team: '+escHtml(state.team)+'</span>' +
+    '<span class="meta-tag">Type: '+escHtml(state.claimType)+'</span>' +
+    '<span class="meta-tag" id="meta-fields"></span>';
+  updateMetaFields();
+}
+function updateMetaFields() {
+  var el = document.getElementById('meta-fields');
+  if (el) el.textContent = 'Fields: ' + (state.activeTab === 'initial' ? state.initFields.length : state.closeFields.length);
+}
+
+function copyPrompt() {
+  var p = state.activeTab === 'initial' ? state.prompts.initial : state.prompts.closing;
+  navigator.clipboard.writeText(p).then(function() {
+    var btn = document.getElementById('copy-btn');
+    var btn2 = document.getElementById('code-copy-btn');
+    btn.textContent = '✓ Copied!';
+    btn2.textContent = '✓';
+    setTimeout(function() { btn.textContent = 'Copy'; btn2.textContent = 'Copy'; }, 2000);
+  });
+}
+
+// ── Library ────────────────────────────────────────────────────────────────────
+function saveToLibrary() {
+  var entry = {
+    id: Date.now(),
+    team: state.team,
+    claimType: state.claimType,
+    date: new Date().toLocaleDateString('en-GB'),
+    initial: state.prompts.initial,
+    closing: state.prompts.closing
+  };
+  state.library.push(entry);
+  localStorage.setItem('symi_lib', JSON.stringify(state.library));
+  state.chat.push({ role: 'assistant', content: '📚 Saved to Prompt Library:\n\nTeam: '+state.team+'\nClaim type: '+state.claimType+'\nDate: '+entry.date+'\n\nAccess it any time from the Library view.' });
+  renderChat();
+}
+
+function showLibrary() {
+  lastStage = state.stage;
+  renderLibrary();
+  [1,2,3,4].forEach(function(s) { var el = document.getElementById('stage-'+s); if (el) el.style.display = 'none'; });
+  document.getElementById('stage-lib').style.display = '';
+}
+
+function renderLibrary() {
+  var list = document.getElementById('library-list');
+  if (!state.library.length) {
+    list.innerHTML = '<div style="text-align:center;padding:60px;color:var(--grey-300);font-size:13px">No prompts saved yet.</div>';
+    return;
+  }
+  list.innerHTML = state.library.map(function(e, i) {
+    return '<div class="lib-entry">'+
+      '<div>'+
+        '<div style="display:flex;align-items:center;margin-bottom:4px">'+
+          '<span style="font-weight:700;color:var(--green-dark);font-size:14px">'+escHtml(e.team)+'</span>'+
+          '<span class="lib-badge badge-green">'+escHtml(e.claimType)+'</span>'+
+          '<span class="lib-badge badge-grey">Saved '+escHtml(e.date)+'</span>'+
+        '</div>'+
+        '<div style="font-size:12px;color:var(--grey-500)">Initial MI + Closing MI prompts</div>'+
+      '</div>'+
+      '<div style="display:flex;gap:6px">'+
+        '<button class="btn-ghost" onclick="navigator.clipboard.writeText(state.library['+i+'].initial)" style="font-size:10px">Copy Initial</button>'+
+        '<button class="btn-ghost" onclick="navigator.clipboard.writeText(state.library['+i+'].closing)" style="font-size:10px">Copy Closing</button>'+
+        '<button class="btn-sm-danger" onclick="deleteLib('+i+')">Delete</button>'+
+      '</div>'+
+    '</div>';
+  }).join('');
+}
+
+function deleteLib(i) {
+  state.library.splice(i, 1);
+  localStorage.setItem('symi_lib', JSON.stringify(state.library));
+  renderLibrary();
+}
+
+// ── Nav library link ───────────────────────────────────────────────────────────
+document.querySelector('a[href="/library"]').addEventListener('click', function(e) {
+  e.preventDefault();
+  showLibrary();
+});
+
+// ── Helpers ────────────────────────────────────────────────────────────────────
+function escHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+// ── Init ───────────────────────────────────────────────────────────────────────
+show(1);
+</script>
+</body>
+</html>
