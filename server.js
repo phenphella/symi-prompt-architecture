@@ -27,6 +27,6 @@ app.post("/api/claude", async (req, res) => {
 });
 app.get("*", (req, res) => res.sendFile(path.join(__dirname, "public", "index.html")));
 app.listen(PORT, () => {
-  console.log("\n  SY-MI Prompt Architect — READY");
-  console.log("  Listening on http://localhost:" + PORT + "\n");
+  console.log("Server running on port " + PORT);
+  console.log("API route: POST /api/claude");
 });
