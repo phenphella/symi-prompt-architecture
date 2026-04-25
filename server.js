@@ -14,12 +14,24 @@ app.post("/api/claude", async (req, res) => {
   try {
     const response = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
-      headers: { "Content-Type": "application/json", "x-api-key": apiKey, "anthropic-version": "2023-06-01" },
-      body: JSON.stringify({ model: "claude-sonnet-4-20250514", max_tokens: 4000, system: req.body.system, messages: req.body.messages }),
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-key": apiKey,
+        "anthropic-version": "2023-06-01"
+      },
+      body: JSON.stringify({
+        model: "claude-sonnet-4-20250514",
+        max_tokens: 4000,
+        system: req.body.system,
+        messages: req.body.messages
+      }),
     });
     const data = await response.json();
     if (!response.ok) return res.status(response.status).json({ error: data });
-    const text = (data.content || []).filter(b => b.type === "text").map(b => b.text).join("");
+    const text = (data.content || [])
+      .filter(b => b.type === "text")
+      .map(b => b.text)
+      .join("");
     res.json({ text });
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -27,6 +39,6 @@ app.post("/api/claude", async (req, res) => {
 });
 app.get("*", (req, res) => res.sendFile(path.join(__dirname, "public", "index.html")));
 app.listen(PORT, () => {
-  console.log("Server running on port " + PORT);
-  console.log("API route: POST /api/claude");
+  console.log("SY-MI server running on port " + PORT);
+  console.log("API route active: POST /api/claude");
 });
