@@ -543,6 +543,29 @@ footer {
 </div>
 
 <!-- STEPPER -->
+
+<div id="api-key-bar" style="background:#fff8e8;border-bottom:2px solid #c9a84c;padding:10px 28px;display:flex;align-items:center;gap:12px;">
+  <label style="font-size:12px;font-weight:700;color:#1a3d2e;white-space:nowrap;">API Key:</label>
+  <input id="api-key-input" type="password" placeholder="sk-ant-api03-..." style="flex:1;max-width:420px;border:1.5px solid #c9a84c;border-radius:6px;padding:7px 12px;font-size:12px;font-family:monospace;outline:none;" />
+  <button onclick="setKey()" style="background:#2d6a4f;color:white;border:none;border-radius:6px;padding:8px 18px;font-size:12px;font-weight:700;cursor:pointer;">Set Key</button>
+  <span id="key-status" style="font-size:11px;color:#6b7280;"></span>
+  <span style="font-size:10px;color:#9ca3af;margin-left:auto;">Key is used only in your browser and never stored or transmitted elsewhere</span>
+</div>
+<script>
+function setKey() {
+  var k = document.getElementById('api-key-input').value.trim();
+  if (!k || !k.startsWith('sk-ant')) {
+    document.getElementById('key-status').textContent = 'Invalid key format';
+    document.getElementById('key-status').style.color = '#dc2626';
+    return;
+  }
+  window.SYMI_API_KEY = k;
+  document.getElementById('key-status').textContent = 'Key set';
+  document.getElementById('key-status').style.color = '#2d6a4f';
+  document.getElementById('api-key-bar').style.borderColor = '#2d6a4f';
+  document.getElementById('api-key-bar').style.background = '#f0fdf4';
+}
+</script>
 <div class="main">
   <div class="stepper" id="stepper">
     <div class="step active" id="step-1" onclick="goToStep(1)">
