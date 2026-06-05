@@ -539,7 +539,7 @@ footer {
 <!-- PAGE HEADER -->
 <div class="page-header">
   <h1>Prompt Architect</h1>
-  <p>Turn any Visual Files MI screen into a complete LLM extraction prompt in minutes. Paste source code, set your defaults, generate, and refine by chat.</p>
+  <p>Turn any structured MI screen into a complete LLM extraction prompt in minutes. Paste source code, set your defaults, generate, and refine by chat.</p>
 </div>
 
 <!-- STEPPER -->
@@ -591,12 +591,12 @@ function setKey() {
     <div class="card">
       <div class="card-title">Step 1 — Team details &amp; source code</div>
       <p class="card-desc">Enter the team name and claim type, then get the source code from the MI screen.<br>
-        <strong>How to get the source code:</strong> Open the MI screen in Visual Files → right-click anywhere on the page → select <strong>"View Page Source"</strong> (or press <strong>Ctrl+U</strong>). This opens the source in a new tab. Press <strong>Ctrl+A</strong> to select all, <strong>Ctrl+C</strong> to copy, then paste it below.
+        <strong>How to get the source code:</strong> Open the MI screen → right-click anywhere on the page → select <strong>"View Page Source"</strong> (or press <strong>Ctrl+U</strong>). This opens the source in a new tab. Press <strong>Ctrl+A</strong> to select all, <strong>Ctrl+C</strong> to copy, then paste it below.
       </p>
       <div class="form-row">
         <div class="form-group">
           <label class="fld" for="inp-team">Team name</label>
-          <input class="inp" id="inp-team" type="text" placeholder="e.g. Allianz Disease">
+          <input class="inp" id="inp-team" type="text" placeholder="e.g. Disease Review">
         </div>
         <div class="form-group">
           <label class="fld" for="inp-claim">Claim type</label>
@@ -605,7 +605,7 @@ function setKey() {
       </div>
       <div class="form-group">
         <label class="fld" for="inp-html">Paste HTML source code</label>
-        <textarea class="inp mono" id="inp-html" rows="10" placeholder="Paste the full Visual Files page source code here…&#10;&#10;How to get it:&#10;1. Open the MI screen in Visual Files&#10;2. Right-click on the page → View Page Source (Ctrl+U)&#10;3. A new tab opens with the source code&#10;4. Press Ctrl+A to select all, then Ctrl+C to copy&#10;5. Click here and press Ctrl+V to paste"></textarea>
+        <textarea class="inp mono" id="inp-html" rows="10" placeholder="Paste the full MI screen source code here…&#10;&#10;How to get it:&#10;1. Open the MI screen&#10;2. Right-click on the page → View Page Source (Ctrl+U)&#10;3. A new tab opens with the source code&#10;4. Press Ctrl+A to select all, then Ctrl+C to copy&#10;5. Click here and press Ctrl+V to paste"></textarea>
       </div>
       <div id="err-1" class="error-msg" style="display:none"></div>
       <div class="btn-row">
@@ -770,13 +770,13 @@ var state = {
 };
 var lastStage = 1;
 
-var SYSTEM_PROMPT = `You are the Sy-MI Prompt Architect, an expert legal AI assistant specialising in writing data extraction prompts for Visual Files MI forms used by UK insurance defence law firms.
+var SYSTEM_PROMPT = `You are the Sy-MI Prompt Architect, an expert legal AI assistant specialising in writing data extraction prompts for structured MI forms used by UK insurance litigation teams.
 
 Generate precise, structured extraction prompts that:
 - Follow the exact two-part structure (Part 1 of 2 / Part 2 of 2)
 - Use VERTICAL CSV output format (FieldName,Value)
 - Include intelligent field rules based on field name, type and UK insurance litigation context
-- Omit unknown fields rather than outputting blanks (preserves existing Visual Files data)
+- Omit unknown fields rather than outputting blanks (preserves existing MI data)
 - List all valid options explicitly for dropdown fields
 - Apply dd/MM/yyyy format to all date fields
 - Apply "numerals only, no £ sign" to all monetary fields
@@ -795,7 +795,7 @@ function parseFieldsFromHTML(html) {
   var fields = [];
   var rows = doc.querySelectorAll('tr');
   rows.forEach(function(row) {
-    var labelEl = row.querySelector("[id^='gvMatterData_lblLabel_']");
+    var labelEl = row.querySelector('[data-mi-label], label, th, td:first-child span, td:first-child');
     if (!labelEl) return;
     var label = labelEl.textContent.trim();
     if (!label) return;
@@ -863,7 +863,7 @@ function parseFields() {
   if (!team || !claim) { err.textContent = 'Please enter team name and claim type.'; err.style.display = 'block'; return; }
   if (!html) { err.textContent = 'Please paste the source code.'; err.style.display = 'block'; return; }
   var fields = parseFieldsFromHTML(html);
-  if (!fields.length) { err.textContent = 'No fields found. Ensure you pasted the complete Visual Files page source code.'; err.style.display = 'block'; return; }
+  if (!fields.length) { err.textContent = 'No fields found. Ensure you pasted the complete MI screen source code.'; err.style.display = 'block'; return; }
   state.team = team; state.claimType = claim;
   var grouped = groupFields(fields);
   state.initFields = grouped.initial; state.closeFields = grouped.closing;
@@ -917,7 +917,7 @@ function generatePrompts() {
   document.getElementById('gen-status').textContent = 'Writing field rules for ' + (state.initFields.length + state.closeFields.length) + ' fields across ' + state.team + ' — ' + state.claimType;
 
   var initMsg = 'Generate the INITIAL MI extraction prompt.\n\nTeam: '+state.team+'\nClaim Type: '+state.claimType+defs+'\n\nINITIAL MI FIELDS ('+state.initFields.length+'):\n'+fmt(state.initFields)+'\n\nContext: The AI model will receive the full case papers from the client plus the fee earner\'s written advice. Insurance defence firm handling '+state.claimType+' for '+state.team+'.\n\nWrite the complete two-part prompt (Part 1 of 2 and Part 2 of 2). End Part 2 with a realistic example output.';
-  var closeMsg = 'Generate the CLOSING/SETTLEMENT MI extraction prompt.\n\nTeam: '+state.team+'\nClaim Type: '+state.claimType+defs+'\n\nCLOSING MI FIELDS ('+state.closeFields.length+'):\n'+fmt(state.closeFields)+'\n\nContext: The AI model will receive settlement correspondence, the costs team\'s initial advice and any request for settlement funds. Omit unknown fields to preserve existing Visual Files data. Include two example outputs: one Part 36 settlement with costs outstanding, one discontinuance.';
+  var closeMsg = 'Generate the CLOSING/SETTLEMENT MI extraction prompt.\n\nTeam: '+state.team+'\nClaim Type: '+state.claimType+defs+'\n\nCLOSING MI FIELDS ('+state.closeFields.length+'):\n'+fmt(state.closeFields)+'\n\nContext: The AI model will receive settlement correspondence, the costs team\'s initial advice and any request for settlement funds. Omit unknown fields to preserve existing MI data. Include two example outputs: one Part 36 settlement with costs outstanding, one discontinuance.';
 
   Promise.all([
     callAPI([{ role: 'user', content: initMsg }]),
